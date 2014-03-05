@@ -22,25 +22,23 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace SpheroRace
-{    public sealed partial class MainPage : Page
+{    
+    public sealed partial class MainPage : Page
     {
         private Sphero m_robot = null;
         private long   m_lastTimeMs;
         private double m_currentX = 0;
         private double m_currentY = 0;
 
+        private bool m_isStarted = false;
+
         private const string c_noSpheroConnected = "No Sphero Connected";
         private const string c_connectingToSphero = "Connecting to {0}";
         private const string c_spheroConnected = "Connected to {0}";
 
-        private Accelerometer _accelerometer;
-        //private uint _desiredReportInterval;
-
         public MainPage()
         {
             this.InitializeComponent();
-
-            _accelerometer = Accelerometer.GetDefault();            
         }
          
         //Начало работы. Переход на основной экран
@@ -51,13 +49,8 @@ namespace SpheroRace
             SetupRobotConnection();
             Application app = Application.Current;
             app.Suspending += OnSuspending;
-
-             // Select a report interval that is both suitable for the purposes of the app and supported by the sensor.
-             // This value will be used later to activate the sensor.
-             //uint minReportInterval = _accelerometer.MinimumReportInterval;
-             //_desiredReportInterval = minReportInterval > 16 ? minReportInterval : 16;
             
-            //_accelerometer.ReportInterval = _desiredReportInterval;
+            Accelerometer _accelerometer = Accelerometer.GetDefault();    
             _accelerometer.ReadingChanged += new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
 
         }
@@ -68,12 +61,12 @@ namespace SpheroRace
             base.OnNavigatedFrom(e);
 
             ShutdownRobotConnection();
-           
+
             Application app = Application.Current;
             app.Suspending -= OnSuspending;
 
+            Accelerometer _accelerometer = Accelerometer.GetDefault();
             _accelerometer.ReadingChanged -= new TypedEventHandler<Accelerometer, AccelerometerReadingChangedEventArgs>(ReadingChanged);
-            _accelerometer.ReportInterval = 0;
         }
 
         //handle the application entering the background
@@ -151,14 +144,14 @@ namespace SpheroRace
                 m_robot.CollisionControl.StartDetectionForWallCollisions();
                 m_robot.CollisionControl.CollisionDetectedEvent += OnCollisionDetectedEvent;
 
-                SetGreenColor();
+                SetRedColor();
             }
         }
 
         //Событие изменения показаний акселерометра
         async private void ReadingChanged(object sender, AccelerometerReadingChangedEventArgs e)
         {
-            if (!StopBtn.IsEnabled)
+            if (!m_isStarted)
                 return;
 
             await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -195,16 +188,18 @@ namespace SpheroRace
         //Запустить робота
         private void StartBtn_Click(object sender, RoutedEventArgs e)
         {
-            SetGreenColor();
-            m_robot.Roll(0, 0);
-
+            m_isStarted = true;
             StartBtn.IsEnabled = false;
-            StopBtn.IsEnabled = true;
+            StopBtn.IsEnabled = true; 
+            
+            SetGreenColor();
+            m_robot.Roll(0, 0);           
         }
 
         //Остановить робота
         private void StopBtn_Click(object sender, RoutedEventArgs e)
         {
+            m_isStarted = false;
             StartBtn.IsEnabled = true;
             StopBtn.IsEnabled = false;
 

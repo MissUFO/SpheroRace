@@ -16,7 +16,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="SpheroName" Grid.Row="0" Grid.Column="0" Text="No Sphero Connected test" FontSize="24"/>
+        <TextBlock x:Name="SpheroName" Grid.Row="0" Grid.Column="0" Text="No Sphero Connected" FontSize="24"/>
         <ToggleSwitch x:Name="ConnectionToggle" Grid.Row="1" Grid.Column="0" Toggled="ConnectionToggle_Toggled" />
         <Button Name="StartBtn" Click="StartBtn_Click" Grid.Row="2" Grid.Column="0" Content="Start" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="100" ></Button>
         <Button Name="StopBtn" Click="StopBtn_Click" Grid.Row="2" Grid.Column="1" Content="Stop" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="100" IsEnabled="False" ></Button>
